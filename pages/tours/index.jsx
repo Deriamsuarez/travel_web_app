@@ -3,13 +3,16 @@
 import React from "react";
 import NavBar from "./components/NavBar";
 import { usePathname } from "next/navigation";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input, useDisclosure } from "@nextui-org/react";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Card from "./components/Card";
 import tours from "@/utils/tourData";
 import Layout from "./layout";
+import AddTourModal from "./components/AddTourModal";
 
 const index = () => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   return (
     <Layout>
       <main className="mx-auto container p-6 flex flex-col gap-8">
@@ -19,7 +22,14 @@ const index = () => {
             <div className="w-[13px] h-[13px] rounded-full border border-zinc-400" />
             <div className="grow shrink basis-0 h-[0px] border border-zinc-400 border-dashed"></div>
           </div>
-          <Button startContent={<PlusIcon className="w-8 h-8 text-white" />} color="primary" >Agregar tour</Button>
+          <Button
+            onClick={onOpen}
+            className="rounded-md"
+            startContent={<PlusIcon className="w-8 h-8 text-white" />}
+            color="primary"
+          >
+            Agregar tour
+          </Button>
         </div>
 
         <div className="flex justify-between gap-4">
@@ -37,11 +47,14 @@ const index = () => {
           {tours.map((tour, index) => (
             <Card key={tour.id} info={tour} />
           ))}
-
-    
         </div>
-     
       </main>
+
+      <AddTourModal
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onOpenChange={onOpenChange}
+      />
     </Layout>
   );
 };

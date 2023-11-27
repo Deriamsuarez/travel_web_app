@@ -13,7 +13,6 @@ import { useRouter } from 'next/router'
 const Card = ({info}) => {
     const router = useRouter()
 
-console.log(info);
   return (
     <CardUi
       className="w-full"
