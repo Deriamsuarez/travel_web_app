@@ -1,4 +1,5 @@
-import React from "react";
+'use client'
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "../layout";
 import tours from "@/utils/tourData";
@@ -13,7 +14,14 @@ import {
 } from "@nextui-org/react";
 import EllipsisVerticalIcon from "@heroicons/react/24/outline/EllipsisVerticalIcon";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { useTour } from "@/connection";
+import { useParams } from "next/navigation";
+
+
+
 const CRUDButton = () => {
+
+
   return (
     <Dropdown>
       <DropdownTrigger>
@@ -35,17 +43,32 @@ const CRUDButton = () => {
   );
 };
 
-const Index = () => {
-  const router = useRouter();
+export default function index ({params}) {
 
-  const tourId = router.query.id;
+  const getTourIdFromCurrentUrl = ()  =>{
+    try {
+      const urlObj = new URL(window.location.href);
+      const pathSegments = urlObj.pathname.split('/');
+      const id = pathSegments[pathSegments.indexOf('tours') + 1];
+      return id;
+    } catch (error) {
+      console.error('Error getting ID from current URL:', error);
+      return null;
+    }
+  }
+  
 
-  const tour = tours.find((item) => item.id === 1);
 
-  return (
-    <Layout>
+  const tourId = getTourIdFromCurrentUrl();
+
+  const tourRequest = useTour(tourId)
+
+const tour = tourRequest.data
+return (
+
+  <Layout>
       <main className="mx-auto container  px-6 py-6 grid grid-cols-12 gap-8">
-        {tour && (
+        {tourRequest.isSuccess && (
           <div className="col-span-full md:col-span-4 bg-white rounded-xl flex flex-col gap-4">
             <div className="flex justify-between">
               <h3 className="text-3xl font-bold">{tour.name}</h3>
@@ -87,7 +110,7 @@ const Index = () => {
         </div>
 
         <div className="col-span-full flex justify-between">
-          <Button
+          <Button 
             startContent={<ChevronLeftIcon className="w-4" />}
             color="primary"
             variant="flat"
@@ -104,7 +127,5 @@ const Index = () => {
         </div>
       </main>
     </Layout>
-  );
-};
-
-export default Index;
+)
+}

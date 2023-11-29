@@ -7,9 +7,3 @@ export const useLogin = () => {
   });
 };
 
-export const useParticipants = (sessionId, config) =>
-  useQuery(
-    ["fetchParticipants", sessionId],
-    () => http.get(`/api/auth/session/${sessionId}/participants`),
-    config
-  );

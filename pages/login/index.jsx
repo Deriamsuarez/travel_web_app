@@ -1,60 +1,78 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { Button, Input } from '@nextui-org/react';
-import { object, string } from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useLogin } from '@/connection';
-import { useDispatch } from 'react-redux';
-import { setUser } from '@/store/slices/customer.slice';
-
+import React from "react";
+import { useForm } from "react-hook-form";
+import { Button, Input } from "@nextui-org/react";
+import { object, string } from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useLogin } from "@/connection";
+import { useDispatch } from "react-redux";
+import authSlice from "@/store/auth";
+import { setUser } from "@/store/slices/customer.slice";
+import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 const schema = object().shape({
-    username: string().required('Username is required'),
-    password: string().required('Password is required'),
-  });
+  username: string().required("Username is required"),
+  password: string().required("Password is required"),
+});
 const Index = () => {
-  const { handleSubmit, register, formState: { errors } } = useForm({
+
+  const router = useRouter()
+
+
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors },
+  } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const login = useLogin()
+  const login = useLogin();
 
-  const onSubmit = (data) => {
-    login.mutate({...data},
-        {
-            onSuccess: (data) => {
-                dispatch(authSlice.actions.setUser(data));
-                toast.success("Se ha logueado satisfactoriamente");
-              },
-              onError: (error) => {
-                toast.error(error.message);
-              },        })
-    console.log(data);
+  const onSubmit = (payload) => {
+    login.mutate(
+      { ...payload },
+      {
+        onSuccess: (data) => {
+          dispatch(authSlice.actions.setUser(data));
+          console.log(data);
+          toast.success("Se ha logueado satisfactoriamente");
+          reset()
+          router.push('/tours')
+        },
+        onError: (error) => {
+          toast.error(error.message);
+        },
+      }
+    );
   };
+
 
   return (
     <main className="flex min-h-screen items-center justify-center p-24">
       <div className="bg-white p-8 flex flex-col gap-2 rounded-lg shadow-lg">
         <h3 className="text-center font-bold text-blue-700 text-xl">Login</h3>
-        <form className='flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <Input
             variant="bordered"
             label="User"
             placeholder="Ingrese su usuario"
             type="text"
-            {...register('username')}
-            isInvalid={Boolean(errors.username )} 
-            errorMessage={errors.username?.message }          />
+            {...register("username")}
+            isInvalid={Boolean(errors.username)}
+            errorMessage={errors.username?.message}
+          />
           <Input
             variant="bordered"
             label="Contraseña"
             placeholder="Ingrese su contraseña"
             type="password"
-            {...register('password')}
-            isInvalid={Boolean(errors.password )} 
-            errorMessage={errors.password?.message }
+            {...register("password")}
+            isInvalid={Boolean(errors.password)}
+            errorMessage={errors.password?.message}
           />
           <Button type="submit" color="primary">
             Ingresar

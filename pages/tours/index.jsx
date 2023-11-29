@@ -3,15 +3,20 @@
 import React from "react";
 import NavBar from "./components/NavBar";
 import { usePathname } from "next/navigation";
-import { Button, Input, useDisclosure } from "@nextui-org/react";
+import { Button, Input, Spinner, useDisclosure } from "@nextui-org/react";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Card from "./components/Card";
-import tours from "@/utils/tourData";
 import Layout from "./layout";
 import AddTourModal from "./components/AddTourModal";
+import { useTours } from "@/connection";
 
 const index = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const tours = useTours()
+
+  console.log(tours.data);
+
 
   return (
     <Layout>
@@ -19,14 +24,13 @@ const index = () => {
         <div className="flex items-center justify-between gap-6">
           <h3 className="text-3xl font-medium min-w-[230px]">Tours creados</h3>
           <div className="w-full h-[13px] justify-start items-center gap-2.5 inline-flex">
-            <div className="w-[13px] h-[13px] rounded-full border border-zinc-400" />
-            <div className="grow shrink basis-0 h-[0px] border border-zinc-400 border-dashed"></div>
+
           </div>
           <Button
             onClick={onOpen}
             className="rounded-md"
-            startContent={<PlusIcon className="w-8 h-8 text-white" />}
             color="primary"
+            
           >
             Agregar tour
           </Button>
@@ -42,12 +46,18 @@ const index = () => {
             placeholder="Buscar tour"
           />
         </div>
-
+{   tours.isSuccess ?
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {tours.map((tour, index) => (
+          {tours.data.map((tour, index) => (
             <Card key={tour.id} info={tour} />
           ))}
         </div>
+        :
+      <div className="h-full flex items-center justify-center">
+        <Spinner size="lg" />
+
+      </div>
+         }
       </main>
 
       <AddTourModal

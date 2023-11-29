@@ -1,20 +1,20 @@
 import { store } from "@/store";
-import { toast } from "react-toastify";
+import { logout } from "@/hooks/useLogout";
 
 export const requestInterceptor = {
   onSuccess: (config) => {
     const state = store.getState();
-
     config.headers = {
-      ...config.headers,
-      Authorization: `Bearer ${state.customer?.accessToken}`,
+      Authorization: `Bearer ${state.auth.token}`,
       Accept: "application/json",
     };
-
     return config;
   },
   onFailed: (error) => {
-    return error;
+    if (error.response.status === 401) {
+      logout();
+      throw new Error("Ha ocurrido un error");
+    }
   },
 };
 
@@ -23,19 +23,10 @@ export const responseInterceptor = {
     return config.data;
   },
   onFailed: (error) => {
-    if (error.response.status === 401) {
-      toast.warning("Su sesión ha culminado. Gracias por preferirnos");
-
-      setTimeout(() => {
-        localStorage.clear();
-        window.location.href = window.location.origin;
-      }, 2000);
-
+    if (error.response?.status === 401) {
+      logout();
       throw new Error("Ha ocurrido un error");
     }
-
-    throw new Error(
-      error.response?.data?.message || error.message || "Ha ocurrido un error"
-    );
+    throw new Error(error|| "Ha ocurrido un error");
   },
 };

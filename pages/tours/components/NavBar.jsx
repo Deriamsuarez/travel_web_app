@@ -34,7 +34,7 @@ export default function NavBar() {
 
   const menu = [
     { label: "Inicio", href: "/dashboard" },
-    { label: "Listado", href: "/list" },
+    { label: "Listado", href: "/tours" },
     { label: "Reportes", href: "/reports" },
   ];
 
@@ -55,7 +55,7 @@ export default function NavBar() {
           <NavbarItem
           isActive={pathname === item.href}
           key={`${item}-${index}`} >
-            <Link color={`${pathname === item.href ? '' :"foreground"}`} href="#">
+            <Link color={`${pathname === item.href ? '' :"foreground"}`} href={item.href}>
               {item.label}
             </Link>
           </NavbarItem>
