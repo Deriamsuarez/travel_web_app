@@ -15,10 +15,17 @@ export const useCreateTour = () => {
   });
 };
 
+export const useAddTourImg = (id) => {
+  return useMutation((data) => {
+    return http.post(`/api/excursions/${id}/images`, data);
+  });
+};
+
 export const useTour = (id, config) => {
   return useQuery(
-    "fetchExcursions",
+    "fetchExcursion",
     () => http.get(`/api/excursions/${id}`),
     config
   );
 };
+
