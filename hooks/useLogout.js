@@ -2,7 +2,7 @@
 export const logout = () => {
   localStorage.clear();
 
-  window.location.href = "/"
+  window.location.href = "/login"
 };
 
 const useLogout = () => logout;

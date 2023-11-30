@@ -79,6 +79,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
           console.log(data);
           toast.success("El tour se ha ceado correctamente");
           reset();
+          onOpenChange(false)
         },
         onError: (error) => {
           toast.error(error.message);

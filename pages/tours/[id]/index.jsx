@@ -56,30 +56,27 @@ export default function index ({params}) {
       return null;
     }
   }
-  
-
 
   const tourId = getTourIdFromCurrentUrl();
-
   const tourRequest = useTour(tourId)
 
 const tour = tourRequest.data
+
+console.log(tour);
 return (
 
   <Layout>
-      <main className="mx-auto container  px-6 py-6 grid grid-cols-12 gap-8">
         {tourRequest.isSuccess && (
+      <main className="mx-auto container  px-6 py-6 grid grid-cols-12 gap-8">
           <div className="col-span-full md:col-span-4 bg-white rounded-xl flex flex-col gap-4">
             <div className="flex justify-between">
               <h3 className="text-3xl font-bold">{tour.name}</h3>
               <CRUDButton />
             </div>
             <Table info={tour} />
-            <ScrollShadow hideScrollBar className=" h-[250px]">
-              <div className="col-span-4 text-justify">{tour.description}</div>
-            </ScrollShadow>
+          
           </div>
-        )}
+      
         <div className="col-span-full md:col-span-8 lg:grid w-full lg:grid-cols-3 lg:gap-8">
           <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-xl lg:block">
             <img
@@ -107,9 +104,12 @@ return (
               className="h-full w-full object-cover object-center"
             />
           </div>
+          <ScrollShadow hideScrollBar className=" bg-[#f5f5f5] rounded-xl p-4 shadow-md  col-span-full max-h-[250px]">
+              <div className="col-span-4 text-justify">{tour.description}</div>
+            </ScrollShadow>
         </div>
 
-        <div className="col-span-full flex justify-between">
+        {/* <div className="col-span-full flex justify-between">
           <Button 
             startContent={<ChevronLeftIcon className="w-4" />}
             color="primary"
@@ -124,8 +124,9 @@ return (
           >
             Viaje a Chile
           </Button>
-        </div>
+        </div> */}
       </main>
+        )}
     </Layout>
 )
 }

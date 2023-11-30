@@ -13,11 +13,11 @@ import { useTours } from "@/connection";
 const index = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+  
+
   const tours = useTours()
 
-  console.log(tours.data);
-
-
+console.log(tours);
   return (
     <Layout>
       <main className="mx-auto container p-6 flex flex-col gap-8">

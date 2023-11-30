@@ -10,6 +10,7 @@ import { MapPinIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import { formatDistance } from "date-fns";
 import { es } from "date-fns/locale";
+import Slider from "@/components/Slider";
 
 const Card = ({ info }) => {
   const router = useRouter();
@@ -28,13 +29,7 @@ const Card = ({ info }) => {
       onPress={() => router.push(`/tours/${info.id}`)}
     >
       <CardBody className="overflow-visible p-0">
-        <Image
-          src="https://www.blogdelfotografo.com/wp-content/uploads/2014/08/61.jpg"
-          shadow="sm"
-          radius="lg"
-          width="100%"
-          className="w-full object-cover h-[140px]"
-        />
+     <Slider />
         <div className="p-4  items-center flex justify-between">
           <div className="leading-4">
             <h3 className="font-bold text-md">{info.name}</h3>
@@ -57,22 +52,22 @@ const Card = ({ info }) => {
               Viajeros
             </span>
             <h3 className="font-medium text-green-600 ">
-              {info.capacity - info.availableSeats}<span className="font-light text-gray-600">/{info.capacity} </span>{" "}
+              {info.passengers}<span className="font-light text-gray-600">/{info.capacity} </span>{" "}
             </h3>
           </div>
           <div className="leading-2 flex flex-col items-center">
             <span className="font-thin text-[14px] tracking-tighter	">
               Tiempo
             </span>
-            <h3 className="font-medium">{timeDistance}</h3>
+            <h3 className="font-medium text-center">{timeDistance}</h3>
           </div>
           <div className="leading-2 flex flex-col items-center">
             <span className="font-thin text-[14px] tracking-tighter	">
-              Disponibilidad
+            Disponibilidad
             </span>
             <div className="flex gap-2 items-center">
-              <div className="w-2 h-2 bg-green-600 rounded-full" />
-              <h3 className="font-medium">Sí</h3>
+              <div className={`w-2 h-2 ${info.passengers === info.capacity ? 'bg-red-600' : 'bg-green-600'}  rounded-full`} />
+              <h3 className="font-medium"> {info.passengers === info.capacity ? 'No' : 'Sí'} </h3>
             </div>
           </div>
         </div>

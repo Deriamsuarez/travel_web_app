@@ -13,9 +13,12 @@ import {
   User,
 } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
+import { useSelector } from "react-redux";
 
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const {name, email} = useSelector(sl => sl.auth)
 
   const pathname = usePathname()
 
@@ -66,8 +69,8 @@ export default function NavBar() {
      
         <NavbarItem>
         <User
-      name="Jane Doe"
-      description="Manager"
+      name={name}
+      description={email}
       avatarProps={{
         src: "https://i.pravatar.cc/150?u=a04258114e29026702d"
       }}
