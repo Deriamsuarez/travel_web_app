@@ -85,9 +85,6 @@ export default function UpdateTourModal({
         toast.error(error.message);
       },
     });
-
-    reset();
-    onOpenChange(false); // Close the modal
   };
 
   return (

@@ -1,4 +1,5 @@
-import { useAddTourImg, useUpdateTourImg } from "@/connection";
+import { useAddTourImg, useDeleteTourImg } from "@/connection";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { PencilIcon, PhotoIcon } from "@heroicons/react/24/solid";
 import { Button, Spinner } from "@nextui-org/react";
 import React, { useState } from "react";
@@ -11,7 +12,7 @@ const Image = ({ id, order, label = "agregar imagen", images }) => {
 
   const { data: addImg, isLoading, mutate } = useAddTourImg(id);
 
-  const { mutate: updateImgMutate} = useUpdateTourImg(id)
+  const { mutate: deleteTourImg} = useDeleteTourImg(id)
 
   const queryClient = useQueryClient();
 
@@ -19,7 +20,7 @@ const Image = ({ id, order, label = "agregar imagen", images }) => {
     inputEl.click();
   };
   const handleImageChange = (e, imgId) => {
-    const file = e.target.files[0];
+    const file = e?.target?.files?.[0];
 
 
     if (file) {
@@ -51,7 +52,7 @@ const Image = ({ id, order, label = "agregar imagen", images }) => {
       });
 
     }else{
-      updateImgMutate(data, {
+      deleteTourImg(imgId, {
         onSuccess: (data) => {
           toast.success("Imagen agregada correctamente");
           queryClient.invalidateQueries({
@@ -67,26 +68,45 @@ const Image = ({ id, order, label = "agregar imagen", images }) => {
     }
   };
 
+  const handleDeleteImage = (e, imgId) => {
+    console.log(imgId);
+    if (imgId) {
+      deleteTourImg(imgId, {
+        onSuccess: (data) => {
+          toast.success("Imagen eliminada correctamente");
+          queryClient.invalidateQueries({
+            queryKey: ["fetchExcursion"],
+          });
+        },
+        onError: (error) => {
+          toast.error("Ha ocurrido un error al eliminar la imagen");
+        },
+      });
+    }
+  };
+
+
   const imgFiltred = images.find((img) => img.order === order);
   return (
     <>
       {imgFiltred ? (
         <div className="relative">
           <Button
-            onClick={handleClickInput}
-            className="absolute right-2 top-2 bg-white opacity-50"
+            onClick={(e) => handleDeleteImage(e, imgFiltred.id)}
+            className="absolute right-2 top-2  opacity-50"
             radius="full"
-            color="red"
+            color="danger"
             isIconOnly
+            variant=""
           >
-            <PencilIcon className="w-5" />
+            <TrashIcon className="w-4" />
           </Button>
           <input
             ref={(ref) => (inputEl = ref)}
             className="hidden"
             type="file"
             accept="image/*"
-            onChange={(e) => handleImageChange(e, imgFiltred)}
+            onChange={(e) => handleImageChange(e, imgFiltred.id)}
           />
           <img
             src={imgFiltred.url}

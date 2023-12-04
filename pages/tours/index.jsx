@@ -30,14 +30,7 @@ const index = () => {
         </div>
 
         <div className="flex justify-between gap-4">
-          <Input
-            border="sm"
-            className="max-w-sm"
-            startContent={<MagnifyingGlassIcon className="w-4 h-4" />}
-            size="sm"
-            type="text"
-            placeholder="Buscar tour"
-          />
+        
         </div>
         {tours.isSuccess ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

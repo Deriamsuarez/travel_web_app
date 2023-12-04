@@ -34,9 +34,9 @@ export const useAddTourImg = (id) => {
   });
 };
 
-export const useUpdateTourImg = (id) => {
-  return useMutation((data, imageId) => {
-    return http.put(`/api/excursions/${id}/image/${imageId}`, data);
+export const useDeleteTourImg = (id) => {
+  return useMutation((imageId) => {
+    return http.delete(`/api/excursions/${id}/images/${imageId}`);
   });
 };
 
