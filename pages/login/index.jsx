@@ -41,7 +41,6 @@ const Index = () => {
       {
         onSuccess: (data) => {
           dispatch(authSlice.actions.setUser(data));
-          console.log(data);
           toast.success("Se ha logueado satisfactoriamente");
           reset()
           router.push('/tours')

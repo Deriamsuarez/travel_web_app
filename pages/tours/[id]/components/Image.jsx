@@ -1,6 +1,6 @@
-import { useAddTourImg } from "@/connection";
-import { PhotoIcon } from "@heroicons/react/24/solid";
-import { Spinner } from "@nextui-org/react";
+import { useAddTourImg, useUpdateTourImg } from "@/connection";
+import { PencilIcon, PhotoIcon } from "@heroicons/react/24/solid";
+import { Button, Spinner } from "@nextui-org/react";
 import React, { useState } from "react";
 import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
@@ -11,14 +11,16 @@ const Image = ({ id, order, label = "agregar imagen", images }) => {
 
   const { data: addImg, isLoading, mutate } = useAddTourImg(id);
 
-  const queryClient = useQueryClient();
+  const { mutate: updateImgMutate} = useUpdateTourImg(id)
 
+  const queryClient = useQueryClient();
 
   const handleClickInput = () => {
     inputEl.click();
   };
-  const handleImageChange = (e) => {
+  const handleImageChange = (e, imgId) => {
     const file = e.target.files[0];
+
 
     if (file) {
       const reader = new FileReader();
@@ -35,36 +37,67 @@ const Image = ({ id, order, label = "agregar imagen", images }) => {
         // const formData = new FormData();
         // formData.append("data", base64Image); // Puedes ajustar el nombre de la clave según tus necesidades
         // formData.append("order", 1); // Puedes ajustar el nombre de la clave según tus necesidades
-        mutate(data, {
-          onSuccess: (data) => {
-            toast.success("Imagen agregada correctamente");
-            queryClient.invalidateQueries({
-                queryKey: ["fetchExcursion"],
-              });        
-              },
-          onError: (error) => {
-            toast.error("Ha ocurrido un error");
+    if(!imgId){
+      mutate(data, {
+        onSuccess: (data) => {
+          toast.success("Imagen agregada correctamente");
+          queryClient.invalidateQueries({
+            queryKey: ["fetchExcursion"],
+          });
+        },
+        onError: (error) => {
+          toast.error("Ha ocurrido un error");
+        },
+      });
 
-            console.log(error);
-          },
-        });
+    }else{
+      updateImgMutate(data, {
+        onSuccess: (data) => {
+          toast.success("Imagen agregada correctamente");
+          queryClient.invalidateQueries({
+            queryKey: ["fetchExcursion"],
+          });
+        },
+        onError: (error) => {
+          toast.error("Ha ocurrido un error");
+        },
+      });
+    }
       };
     }
   };
 
-  const imgFiltred = images.find(img => img.order === order)
-console.log(imgFiltred);
+  const imgFiltred = images.find((img) => img.order === order);
   return (
     <>
-    {imgFiltred ?
-    <img src={imgFiltred.url} className="cursor-pointer h-full w-full object-cover rounded-xl border-2  text-gray-400 p-4 min-h-[150px] flex flex-col gap-1 justify-center items-center"
-    />
-   :
-      !isLoading ? (
+      {imgFiltred ? (
+        <div className="relative">
+          <Button
+            onClick={handleClickInput}
+            className="absolute right-2 top-2 bg-white opacity-50"
+            radius="full"
+            color="red"
+            isIconOnly
+          >
+            <PencilIcon className="w-5" />
+          </Button>
+          <input
+            ref={(ref) => (inputEl = ref)}
+            className="hidden"
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleImageChange(e, imgFiltred)}
+          />
+          <img
+            src={imgFiltred.url}
+            className="cursor-pointer h-full w-full object-cover rounded-xl border-2  text-gray-400 p-2 min-h-[150px] max-h-[200px] flex flex-col gap-1 justify-center items-center"
+          />
+        </div>
+      ) : !isLoading ? (
         <>
           <div
             onClick={handleClickInput}
-            className="cursor-pointer rounded-xl border-2 hover:border-primary hover:text-primary text-gray-400 border-dashed p-4 min-h-[150px] flex flex-col gap-1 justify-center items-center"
+            className="cursor-pointer rounded-xl border-2 hover:border-primary hover:text-primary text-gray-400 border-dashed p-4 min-h-[150px] max-h-[200px] flex flex-col gap-1 justify-center items-center"
           >
             <PhotoIcon className="w-6 " />
             <span className="uppercase font-bold text-[14px] ">{label}</span>
@@ -82,7 +115,6 @@ console.log(imgFiltred);
           <Spinner size="md" color="default" />
         </div>
       )}
-    
     </>
   );
 };

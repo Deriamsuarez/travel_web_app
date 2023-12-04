@@ -11,12 +11,15 @@ import {
   DropdownItem,
   Button,
   ScrollShadow,
+  useDisclosure,
 } from "@nextui-org/react";
 import EllipsisVerticalIcon from "@heroicons/react/24/outline/EllipsisVerticalIcon";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { useTour } from "@/connection";
+import { useDeleteTour, useTour } from "@/connection";
 import { useParams } from "next/navigation";
 import Image from "./components/Image";
+import { toast } from "react-toastify";
+import UpdateTourModal from "./components/UpdateTourModal";
 
 const imagesArray = [
   { label: "imagen principal", order: 1 },
@@ -25,7 +28,24 @@ const imagesArray = [
   { label: "Agregar imagen", order: 4 },
 ];
 
-const CRUDButton = () => {
+const CRUDButton = ({ id, onOpenChange }) => {
+  const router = useRouter();
+  const { mutate } = useDeleteTour(id);
+
+  const onDelete = () => {
+    mutate(
+      {},
+      {
+        onSuccess: (data) => {
+          toast.success("Tour eliminado correctamente");
+          router.push("/tours");
+        },
+        onError: (error) => {
+          toast.error("Ha ocurrido un error al eliminar el tour");
+        },
+      }
+    );
+  };
   return (
     <Dropdown>
       <DropdownTrigger>
@@ -35,11 +55,18 @@ const CRUDButton = () => {
       </DropdownTrigger>
       <DropdownMenu
         aria-label="Example with disabled actions"
-        disabledKeys={["edit", "delete"]}
+        // disabledKeys={["edit", "delete"]}
       >
-        <DropdownItem key="new">Editar</DropdownItem>
-        <DropdownItem key="edit">Desactivar inscripción</DropdownItem>
-        <DropdownItem key="delete" className="text-danger" color="danger">
+        <DropdownItem onClick={onOpenChange} key="new">
+          Editar tour
+        </DropdownItem>
+        {/* <DropdownItem key="edit">Desactivar inscripción</DropdownItem> */}
+        <DropdownItem
+          onClick={onDelete}
+          key="delete"
+          className="text-danger"
+          color="danger"
+        >
           Eliminar tour
         </DropdownItem>
       </DropdownMenu>
@@ -48,6 +75,8 @@ const CRUDButton = () => {
 };
 
 export default function index({ params }) {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const getTourIdFromCurrentUrl = () => {
     try {
       const urlObj = new URL(window.location.href);
@@ -65,9 +94,6 @@ export default function index({ params }) {
 
   const tour = tourRequest.data;
 
-
-
-  console.log(tour);
   return (
     <Layout>
       {tourRequest.isSuccess && (
@@ -75,21 +101,21 @@ export default function index({ params }) {
           <div className="col-span-full md:col-span-4 bg-white rounded-xl flex flex-col gap-4">
             <div className="flex justify-between">
               <h3 className="text-3xl font-bold">{tour.name}</h3>
-              <CRUDButton />
+              <CRUDButton id={tourId} onOpenChange={onOpenChange} />
             </div>
             <Table info={tour} />
           </div>
 
           <div className="col-span-full md:col-span-8 w-full grid grid-cols-2 gap-4">
-            {imagesArray.map((image, index) => 
+            {imagesArray.map((image, index) => (
               <Image
-              images={tour.images}
+                images={tour.images}
                 key={index}
                 id={tour.id}
                 order={image.order}
                 label={image.label}
               />
-            )}
+            ))}
             <ScrollShadow
               hideScrollBar
               className=" bg-[#f5f5f5] rounded-xl p-4 shadow-md  col-span-full max-h-[250px]"
@@ -98,22 +124,12 @@ export default function index({ params }) {
             </ScrollShadow>
           </div>
 
-          {/* <div className="col-span-full flex justify-between">
-          <Button 
-            startContent={<ChevronLeftIcon className="w-4" />}
-            color="primary"
-            variant="flat"
-          >
-            Viaje a colombia
-          </Button>
-          <Button
-            endContent={<ChevronRightIcon className="w-4" />}
-            color="primary"
-            variant="flat"
-          >
-            Viaje a Chile
-          </Button>
-        </div> */}
+          <UpdateTourModal
+            data={tour}
+            isOpen={isOpen}
+            onOpen={onOpen}
+            onOpenChange={onOpenChange}
+          />
         </main>
       )}
     </Layout>

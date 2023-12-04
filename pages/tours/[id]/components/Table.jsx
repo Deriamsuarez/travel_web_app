@@ -10,7 +10,7 @@ import {
 import { format } from "date-fns";
 
 const Table = ({info}) => {
-console.log(info);
+
   return (
     <div className="flex flex-col gap-8">
     <TableUi isStriped aria-label="Example static collection table">

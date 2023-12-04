@@ -21,6 +21,7 @@ const Card = ({ info }) => {
     { locale: es }
   );
 
+
   return (
     <CardUi
       className="w-full"
@@ -29,7 +30,15 @@ const Card = ({ info }) => {
       onPress={() => router.push(`/tours/${info.id}`)}
     >
       <CardBody className="overflow-visible p-0">
-     <Slider />
+     {/* <Slider />
+      */}
+
+<Image
+      src={info.primaryImageUrl || '/no_image.png'}
+      shadow="sm"
+      width="100%"
+      className="w-full object-cover h-[140px] keen-slider__slide"
+    />
         <div className="p-4  items-center flex justify-between">
           <div className="leading-4">
             <h3 className="font-bold text-md">{info.name}</h3>

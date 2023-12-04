@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import React from "react";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { bool, date, number, object, string } from "yup";
 import {
@@ -15,10 +15,9 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
-import { useCreateTour } from "@/connection";
+import { useUpdateTour } from "@/connection";
 import { toast } from "react-toastify";
 import { useQueryClient } from "react-query";
-import { PhotoIcon } from "@heroicons/react/24/outline";
 
 const schema = object().shape({
   name: string().required("Name is required"),
@@ -53,104 +52,54 @@ const countries = [
   "Reino Unido",
 ];
 
-export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
+export default function UpdateTourModal({
+  isOpen,
+  onOpen,
+  onOpenChange,
+  data,
+}) {
   const {
     handleSubmit,
     register,
     reset,
     formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  const [image, setImage] = useState(null);
-  let inputEl = null;
+  } = useForm({ resolver: yupResolver(schema) });
 
   const queryClient = useQueryClient();
 
-  const { mutate, isLoading } = useCreateTour();
+  const { mutate } = useUpdateTour(data.id);
 
-  const handleClickInput = () => {
-    inputEl.click();
-  };
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      let base64Image = "";
-      reader.onloadend = () => {
-        base64Image = reader.result;
-        const formattedBase = base64Image.split(",")[1];
-        setImage(formattedBase);
-      };
-    }
-  };
 
   const onSubmit = (payload) => {
-    if (image) {
-      const data = { ...payload, images: [{ data: image, order: 1 }] };
-      mutate(data, {
-        onSuccess: (data) => {
-          queryClient.invalidateQueries({
-            queryKey: ["fetchExcursions"],
-          });
-          toast.success("El tour se ha creado correctamente");
-          reset();
-          onOpenChange(false);
-        },
-        onError: (error) => {
-          toast.error(error.message);
-        },
-      });
 
-      reset();
-      onOpenChange(false); // Close the modal
-    } else {
-      toast.error("La imagen es requerida");
-    }
+    mutate(payload, {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          queryKey: ["fetchExcursion"],
+        });
+        toast.success("El tour se ha actualizado correctamente");
+        reset();
+        onOpenChange(false);
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    });
+
+    reset();
+    onOpenChange(false); // Close the modal
   };
+
   return (
     <Modal size="xl" isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalContent>
         {(onClose) => (
           <form onSubmit={handleSubmit(onSubmit)}>
             <ModalHeader className="flex flex-col gap-1">
-              Crear tour
+              Editar tour
               <Divider />
             </ModalHeader>
             <ModalBody className="grid grid-cols-6 gap-4">
-              {!image ? (
-                <div className="col-span-full">
-                  <div
-                    onClick={handleClickInput}
-                    className="cursor-pointer rounded-xl border-2 hover:border-primary hover:text-primary text-gray-400 border-dashed p-4 min-h-[150px] max-h-[200px] flex flex-col gap-1 justify-center items-center"
-                  >
-                    <PhotoIcon className="w-6 " />
-                    <span className="uppercase font-bold text-[14px] text-center ">
-                      Imagen principal
-                      <br />
-                      <span className="text-center font-light text-[12px]">
-                        Imagen principal obligatoria
-                      </span>
-                    </span>
-                  </div>
-                  <input
-                    ref={(ref) => (inputEl = ref)}
-                    className="hidden"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                </div>
-              ) : (
-                <img
-                  src={image}
-                  className=" col-span-full cursor-pointer h-full w-full object-cover rounded-xl border-2  text-gray-400 p-2 min-h-[150px] max-h-[200px] flex flex-col gap-1 justify-center items-center"
-                />
-              )}
-
               <Input
                 autocomplete="off"
                 className="col-span-4"
@@ -162,6 +111,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
                 {...register("name")}
                 isInvalid={Boolean(errors.name)}
                 errorMessage={errors.name?.message}
+                defaultValue={data.name}
               />
               <Input
                 className="col-span-2"
@@ -174,7 +124,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
                 {...register("capacity")}
                 isInvalid={Boolean(errors.capacity)}
                 errorMessage={errors.capacity?.message}
-                defaultValue={0}
+                defaultValue={data.capacity}
               />
               <Input
                 autocomplete="off"
@@ -187,16 +137,19 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
                 {...register("destinationLocation")}
                 isInvalid={Boolean(errors.destinationLocation)}
                 errorMessage={errors.destinationLocation?.message}
+                defaultValue={data.destinationLocation}
               />
               <Select
                 label="País de destino"
                 className="col-span-2"
                 radius="sm"
                 labelPlacement="outside"
-                placeholder="Sleccione un país"
+                placeholder="Seleccione un país"
                 {...register("destination")}
                 isInvalid={Boolean(errors.destination)}
                 errorMessage={errors.destination?.message}
+                defaultValue={data.destination}
+                defaultSelectedKeys={[data.destination]}
               >
                 {countries.map((country) => (
                   <SelectItem key={country} value={country}>
@@ -215,7 +168,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
                 {...register("price")}
                 isInvalid={Boolean(errors.price)}
                 errorMessage={errors.price?.message}
-                defaultValue={0}
+                defaultValue={data.price}
                 startContent={
                   <span className="text-gray-400 text-[12px]">$</span>
                 }
@@ -231,6 +184,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
                 {...register("schedule.departure")}
                 isInvalid={Boolean(errors.schedule?.departure)}
                 errorMessage={errors.schedule?.departure?.message}
+                defaultValue={data.schedule.departure}
               />
               <Input
                 autocomplete="off"
@@ -243,6 +197,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
                 {...register("schedule.return")}
                 isInvalid={Boolean(errors.schedule?.return)}
                 errorMessage={errors.schedule?.return?.message}
+                defaultValue={data.schedule.return}
               />
               <Textarea
                 autocomplete="off"
@@ -255,6 +210,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
                 {...register("description")}
                 isInvalid={Boolean(errors.description)}
                 errorMessage={errors.description?.message}
+                defaultValue={data.description}
               />
               <Input
                 autocomplete="off"
@@ -267,6 +223,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
                 {...register("departureLocation")}
                 isInvalid={Boolean(errors.departureLocation)}
                 errorMessage={errors.departureLocation?.message}
+                defaultValue={data.departureLocation}
               />
               <Input
                 autocomplete="off"
@@ -279,6 +236,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
                 {...register("schedule.meeting")}
                 isInvalid={Boolean(errors.schedule?.meeting)}
                 errorMessage={errors.schedule?.meeting?.message}
+                defaultValue={data.schedule.meeting}
               />
             </ModalBody>
             <ModalFooter>
@@ -286,7 +244,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
                 Cancel
               </Button>
               <Button color="primary" radius="sm" type="submit">
-                Create Tour
+                Editar Tour
               </Button>
             </ModalFooter>
           </form>

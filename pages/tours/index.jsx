@@ -13,25 +13,18 @@ import { useTours } from "@/connection";
 const index = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  
+  const tours = useTours();
 
-  const tours = useTours()
 
-console.log(tours);
+  const activeTours = tours.data?.filter(elem => elem.isActive !== false)
+
   return (
     <Layout>
       <main className="mx-auto container p-6 flex flex-col gap-8">
         <div className="flex items-center justify-between gap-6">
           <h3 className="text-3xl font-medium min-w-[230px]">Tours creados</h3>
-          <div className="w-full h-[13px] justify-start items-center gap-2.5 inline-flex">
-
-          </div>
-          <Button
-            onClick={onOpen}
-            className="rounded-md"
-            color="primary"
-            
-          >
+          <div className="w-full h-[13px] justify-start items-center gap-2.5 inline-flex"></div>
+          <Button onClick={onOpen} className="rounded-md" color="primary">
             Agregar tour
           </Button>
         </div>
@@ -46,18 +39,17 @@ console.log(tours);
             placeholder="Buscar tour"
           />
         </div>
-{   tours.isSuccess ?
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {tours.data.map((tour, index) => (
-            <Card key={tour.id} info={tour} />
-          ))}
-        </div>
-        :
-      <div className="h-full flex items-center justify-center">
-        <Spinner size="lg" />
-
-      </div>
-         }
+        {tours.isSuccess ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {activeTours.map((tour, index) => (
+              <Card key={tour.id} info={tour} />
+            ))}
+          </div>
+        ) : (
+          <div className="h-full flex items-center justify-center">
+            <Spinner size="lg" />
+          </div>
+        )}
       </main>
 
       <AddTourModal

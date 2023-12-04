@@ -50,7 +50,6 @@ const Slider = () => {
       key={source}
       src="https://www.blogdelfotografo.com/wp-content/uploads/2014/08/61.jpg"
       shadow="sm"
-      radius="lg"
       width="100%"
       className="w-full object-cover h-[140px] keen-slider__slide"
     />
