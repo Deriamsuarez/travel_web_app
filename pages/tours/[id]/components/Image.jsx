@@ -93,13 +93,12 @@ const Image = ({ id, order, label = "agregar imagen", images }) => {
         <div className="relative">
           <Button
             onClick={(e) => handleDeleteImage(e, imgFiltred.id)}
-            className="absolute right-2 top-2  opacity-50"
+            className="absolute right-2 top-2 "
             radius="full"
-            color="danger"
+            color=""
             isIconOnly
-            variant=""
           >
-            <TrashIcon className="w-4" />
+            <TrashIcon className="w-4 text-danger-500" />
           </Button>
           <input
             ref={(ref) => (inputEl = ref)}

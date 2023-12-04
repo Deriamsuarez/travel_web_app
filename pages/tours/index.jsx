@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import NavBar from "./components/NavBar";
 import { usePathname } from "next/navigation";
@@ -15,9 +13,8 @@ const index = () => {
 
   const tours = useTours();
 
-
-  const activeTours = tours.data?.filter(elem => elem.isActive !== false)
-
+  const activeTours = tours.data?.filter((elem) => elem.isActive !== false);
+  console.log(activeTours);
   return (
     <Layout>
       <main className="mx-auto container p-6 flex flex-col gap-8">
@@ -29,9 +26,7 @@ const index = () => {
           </Button>
         </div>
 
-        <div className="flex justify-between gap-4">
-        
-        </div>
+        <div className="flex justify-between gap-4"></div>
         {tours.isSuccess ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {activeTours.map((tour, index) => (
