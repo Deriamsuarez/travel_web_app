@@ -53,7 +53,7 @@ const Image = ({ id, order, label = "agregar imagen", images }) => {
   };
 
   const imgFiltred = images.find(img => img.order === order)
-console.log(imgFiltred);
+
   return (
     <>
     {imgFiltred ?

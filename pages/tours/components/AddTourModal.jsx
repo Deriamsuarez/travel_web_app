@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { bool, date, number, object, string } from "yup";
+import { array, bool, date, number, object, string } from "yup";
 import {
   Modal,
   ModalContent,
@@ -18,6 +18,7 @@ import {
 import { useCreateTour } from "@/connection";
 import { toast } from "react-toastify";
 import { useQueryClient } from "react-query";
+import { PhotoIcon } from "@heroicons/react/24/solid";
 
 const schema = object().shape({
   name: string().required("Name is required"),
@@ -31,6 +32,7 @@ const schema = object().shape({
   description: string(),
   isPublic: bool(),
   isActive: bool(),
+  images: array().required('Debes de cargar una imagen'),
   schedule: object({
     meeting: date().required("Requerido"),
     departure: date().required("Requerido"),
@@ -62,13 +64,35 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
     resolver: yupResolver(schema),
   });
 
+  const [image, setImage] = useState(null);
+
+  let inputEl = null;
+
   const queryClient = useQueryClient();
 
   const createTour = useCreateTour();
 
-  const onSubmit = (payload) => {
-    console.log(payload);
+  const handleClickInput = () => {
+    inputEl.click();
+  };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      let base64Image = "";
+      reader.onloadend = () => {
+        base64Image = reader.result;
+        const formattedBase = base64Image.split(",")[1];
+        setImage([{ data: formattedBase, order: 1 }]);
+      };
+    }
+  };
+
+  console.log(image);
+  const onSubmit = (payload) => {
     createTour.mutate(
       { ...payload },
       {
@@ -79,7 +103,7 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
           console.log(data);
           toast.success("El tour se ha ceado correctamente");
           reset();
-          onOpenChange(false)
+          onOpenChange(false);
         },
         onError: (error) => {
           toast.error(error.message);
@@ -102,6 +126,26 @@ export default function AddTourModal({ isOpen, onOpen, onOpenChange }) {
               <Divider />
             </ModalHeader>
             <ModalBody className="grid grid-cols-6 gap-4">
+              <div className="col-span-full">
+                <div
+                  onClick={handleClickInput}
+                  className="cursor-pointer rounded-xl border-2 hover:border-primary hover:text-primary text-gray-400 border-dashed p-4 min-h-[150px] flex flex-col gap-1 justify-center items-center"
+                >
+                  <PhotoIcon className="w-6 " />
+                  <span className="uppercase font-bold text-[14px] ">
+                    Imagen Principal
+                  </span>
+                </div>
+                <input
+                  ref={(ref) => (inputEl = ref)}
+                  className="hidden"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  {...register("images")}
+
+                />
+              </div>
               <Input
                 autocomplete="off"
                 className="col-span-4"
